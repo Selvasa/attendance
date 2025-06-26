@@ -1,0 +1,30 @@
+{
+  "name": "attendance",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/Selvasa/attendance#readme",
+  "bugs": {
+    "url": "https://github.com/Selvasa/attendance/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Selvasa/attendance.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --exec \"cls && node index.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.0",
+    "nodeman": "^1.1.2"
+  }
+}
