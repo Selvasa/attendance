@@ -11,7 +11,7 @@ route.post("/login", async (req, res) => {
     console.log(login)
     if (login) {
         const token = generateToken(login);
-        return res.json({ token: token, message: 'Login Success fully ' })
+        return res.json({ token: token, message: 'Login Success fully ',data:login })
     }
     else {
         return res.status(401).json({ message: 'Password Incorrect' });
