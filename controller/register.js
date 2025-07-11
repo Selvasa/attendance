@@ -4,26 +4,44 @@ const Register = require('../model/createEmpModel');
 
 
 router.post("/register", async (req, res) => {
-    const { employeeName,
+    const {
+        employeeName,
         employeeEmail,
-        joiningDate,
+        workLocation,
+        department,
         role,
+        designation,
+        joinDate,
+        bankAccount,
+        uanNumber,
+        esiNumber,
+        panNumber,
+        resourceType,
         username,
-        password } = req.body;
-    console.log(employeeName,
-        employeeEmail,
-        joiningDate,
-        role,
-        username,
-        password)
+        password,
+        address,
+        phone,
+
+    } = req.body;
+    console.log(req.body)
     try {
         const createEmp = await new Register({
             employeeName,
             employeeEmail,
-            joiningDate,
+            workLocation,
+            department,
             role,
+            designation,
+            joinDate,
+            bankAccount,
+            uanNumber,
+            esiNumber,
+            panNumber,
+            resourceType,
             username,
-            password
+            password,
+            address,
+            phone, status: false,
         }).save();
         res.status(201).json({ msg: "Employee Created Successfully" })
     }

@@ -7,10 +7,9 @@ const verifyToken = async (req, res, next) => {
         return res.status(401).json({ message: "Token are missing" });
     }
     const token = authToken.split(" ")[1];
-
     jwt.verify(token, process.env.KEY, async (err, decoded) => {
         if (err) {
-            return res.status(403).json({ message: "Invalid Token" })
+            return res.status(403).json({ err: err.message, message: "Invalid Token" })
         }
         else {
             let users = await Register.find({ _id: decoded.id });
@@ -20,7 +19,6 @@ const verifyToken = async (req, res, next) => {
             }
             req.user = users
         }
-
         next();
     })
 
