@@ -53,6 +53,18 @@ route.post("/checkin", verifyToken, async (req, res) => {
     }
 
 })
+route.post("/checkin/:id", verifyToken, async (req, res) => {
+     const { id: ids } = req.params
+    try {
+        const Checkin = await  Checking.findById(ids);
+        res.status(200).json({ msg: "Check in Successfully", data: Checkin })
+    }
+    catch (err) {
+        console.log("get Check in Failed:", err.message);
+        res.status(500).json({ msg: "get Check in Failed", error: err.message });
+    }
+
+})
 
 route.put("/checkout/:id", verifyToken, async (req, res) => {
     const { id: ids } = req.params
