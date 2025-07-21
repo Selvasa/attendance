@@ -96,13 +96,12 @@ route.get("/view/:id", async (req, res) => {
 
 route.put("/update/:id", async (req, res) => {
     const { id } = req.params;
-    const { employeeName, employeeEmail, joiningDate, role, username, password, status } = req.body;
     try {
         const user = await Loging.findByIdAndUpdate(id, req.body);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        res.status(201).json({ message: "Updated successfully", data: user });
+        res.status(201).json({ message: "Updated successfully"});
     } catch (err) {
         console.error("Error fetching user:", err);
         res.status(500).json({ error: "Server error" });
