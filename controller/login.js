@@ -54,9 +54,9 @@ route.post("/checkin", verifyToken, async (req, res) => {
 
 })
 route.post("/checkin/:id", verifyToken, async (req, res) => {
-     const { id: ids } = req.params
+    const { id: ids } = req.params
     try {
-        const Checkin = await  Checking.findById(ids);
+        const Checkin = await Checking.findById(ids);
         res.status(200).json({ msg: "Check in Successfully", data: Checkin })
     }
     catch (err) {
@@ -98,7 +98,7 @@ route.put("/update/:id", async (req, res) => {
     const { id } = req.params;
     const { employeeName, employeeEmail, joiningDate, role, username, password, status } = req.body;
     try {
-        const user = await Loging.findByIdAndUpdate(id, { employeeName, employeeEmail, joiningDate, role, username, password, status: false });
+        const user = await Loging.findByIdAndUpdate(id, req.body);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
