@@ -20,29 +20,12 @@ router.post("/register", async (req, res) => {
         username,
         password,
         address,
-        phone,
+        phone, status
 
     } = req.body;
     console.log(req.body)
     try {
-        const createEmp = await new Register({
-            employeeName,
-            employeeEmail,
-            workLocation,
-            department,
-            role,
-            designation,
-            joinDate,
-            bankAccount,
-            uanNumber,
-            esiNumber,
-            panNumber,
-            resourceType,
-            username,
-            password,
-            address,
-            phone, status: false,
-        }).save();
+        const createEmp = await new Register({ ...req.body, status: false }).save();
         res.status(201).json({ msg: "Employee Created Successfully" })
     }
     catch (err) {
