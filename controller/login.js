@@ -4,19 +4,14 @@ const Register = require("../model/createEmpModel");
 const generateToken = require("../middleware/token");
 const verifyToken = require('../middleware/verify');
 const { Query } = require('mongoose');
+const {
+  getCurrentDate,
+  filterTodayLogs,
+  calculateDuration,
+  updateTimeLog
+} = require('../utils/timeUtils');
 
-function getCurrentDate() {
-  const now = new Date();
-  const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const year = now.getFullYear();
-  return `${day}/${month}/${year}`;
-}
 
-function filterTodayLogs(timelog = []) {
-  const today = getCurrentDate();
-  return timelog.filter(log => log.date === today);
-}
 
 
 route.post("/login", async (req, res) => {
@@ -107,17 +102,17 @@ route.post('/checkout', verifyToken, async (req, res) => {
       return res.status(400).json({ message: 'Not checked in today' });
     }
 
-    const [day, month, year] = today.split('/');
-    const isoDate = `${year}-${month}-${day}`;
-    const checkinTime = new Date(`${isoDate}T${log.checkin}`);
-    const checkoutTime = new Date(`${isoDate}T${checkout}`);
+    const checkinTime = new Date(log.checkin);
+    const checkoutTime = new Date(checkout);
+    const diffMins = (checkoutTime - checkinTime) / (1000 * 60);
 
-    const diffMs = checkoutTime - checkinTime;
-    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    if (diffMins < 30) {
+      return res.status(403).json({ message: 'Cannot checkout before 30 minutes of check-in' });
+    }
 
     log.checkout = checkout;
-    log.totalhours = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    log.totalhours = calculateDuration(log.checkin, log.checkout);
+    log.autocheckout = false;
     employee.status = false;
 
     await employee.save();
@@ -128,7 +123,6 @@ route.post('/checkout', verifyToken, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 
 route.get("/view/:id", async (req, res) => {
   const { id } = req.params;
