@@ -81,18 +81,39 @@ route.put("/checkout/:id", verifyToken, async (req, res) => {
 })
 
 route.get("/view/:id", async (req, res) => {
-    const { id } = req.params;
-    try {
-        const user = await Loging.findById(id);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json(user);
-    } catch (err) {
-        console.error("Error fetching user:", err);
-        res.status(500).json({ error: "Server error" });
+  const { id } = req.params;
+  try {
+    const today = getCurrentDate();
+    const hoursCalculation = await Register.findById(id);
+
+    if (!hoursCalculation) {
+      console.error("User not found");
+      return;
     }
-})
+
+    hoursCalculation?.timelog?.map((item) => {
+      if (item.date === today && item.checkin) {
+        const workinghour = workingHours(item.checkin);
+        item.workinghours = workinghour
+      }
+    })
+    await hoursCalculation.save();
+
+    const user = await Register.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const filtered = {
+      ...user.toObject(),
+      timelog: filterTodayLogs(user.timelog)
+    };
+    res.status(200).json(filtered);
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 route.put("/update/:id", async (req, res) => {
     const { id } = req.params;
