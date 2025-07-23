@@ -152,7 +152,7 @@ route.get("/view/:id", async (req, res) => {
     hoursCalculation?.timelog?.map((item) => {
       if (item.date === today && item.checkin) {
         const workinghour = workingHours(item.checkin);
-        item.workinghours = workinghour
+        item.totalhours = workinghour
       }
     })
     await hoursCalculation.save();
