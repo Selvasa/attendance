@@ -8,46 +8,57 @@ const {
   getCurrentDate,
   filterTodayLogs,
   calculateDuration,
-  updateTimeLog
 } = require('../utils/timeUtils');
 
 
-
-
 route.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-    const [login] = await Register.find({ username, password });
-    console.log(login)
-    if (login) {
-        const token = generateToken(login);
-        return res.json({ token: token, message: 'Login Success fully ', data: login })
-    }
-    else {
-        return res.status(401).json({ message: 'Password Incorrect' });
-    }
+  const { username, password } = req.body;
+  const [login] = await Register.find({ username, password });
+  console.log(login)
+  if (login) {
+    const token = generateToken(login);
+    return res.json({ token: token, message: 'Login Success fully ', data: login })
+  }
+  else {
+    return res.status(401).json({ message: 'Password Incorrect' });
+  }
 })
 
 route.get("/allemp", async (req, res) => {
-    const empDetails = await Register.find();
-    console.log(empDetails)
-    if (empDetails) {
-        return res.status(200).json({ data: empDetails })
-    }
-    else {
-        return res.status(401).json({ message: 'User not found' });
-    }
-})
+  try {
+    const today = getCurrentDate();
+    const empDetails = await Register.aggregate([
+      {
+        $addFields: {
+          timelog: {
+            $filter: {
+              input: "$timelog",
+              as: "log",
+              cond: { $eq: ["$$log.date", today] }
+            }
+          }
+        }
+      }
+    ]);
+
+    console.log(empDetails);
+    return res.status(200).json({ data: empDetails });
+  } catch (error) {
+    console.error('Error fetching employee details:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 route.get("/allcheckin/:id", verifyToken, async (req, res) => {
-    const { id } = req.params
-    try {
-        const Checkin = await Register.findById(id);
-        res.status(200).json({ data: Checkin.timelog })
-    }
-    catch (err) {
-        console.log("get Checkin Failed:", err.message);
-        res.status(500).json({ msg: "get Checkin Failed", error: err.message });
-    }
+  const { id } = req.params
+  try {
+    const Checkin = await Register.findById(id);
+    res.status(200).json({ data: Checkin.timelog })
+  }
+  catch (err) {
+    console.log("get Checkin Failed:", err.message);
+    res.status(500).json({ msg: "get Checkin Failed", error: err.message });
+  }
 })
 
 route.post("/checkin", verifyToken, async (req, res) => {
@@ -144,30 +155,30 @@ route.get("/view/:id", async (req, res) => {
 
 
 route.put("/update/:id", async (req, res) => {
-    const { id } = req.params;
-    try {
-        const user = await Register.findByIdAndUpdate(id, req.body);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(201).json({ message: "Updated successfully" });
-    } catch (err) {
-        console.error("Error fetching user:", err);
-        res.status(500).json({ error: "Server error" });
+  const { id } = req.params;
+  try {
+    const user = await Register.findByIdAndUpdate(id, req.body);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+    res.status(201).json({ message: "Updated successfully" });
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 })
 
 route.delete("/delete/:id", async (req, res) => {
-    const { id } = req.params;
-    try {
-        const user = await Register.findByIdAndDelete(id);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(201).json({ message: "deleted successfully", data: user });
-    } catch (err) {
-        console.error("Error fetching user:", err);
-        res.status(500).json({ error: "Server error" });
+  const { id } = req.params;
+  try {
+    const user = await Register.findByIdAndDelete(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+    res.status(201).json({ message: "deleted successfully", data: user });
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 })
 module.exports = route;
