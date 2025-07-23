@@ -5,6 +5,20 @@ const generateToken = require("../middleware/token");
 const verifyToken = require('../middleware/verify');
 const { Query } = require('mongoose');
 
+function getCurrentDate() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = now.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+function filterTodayLogs(timelog = []) {
+  const today = getCurrentDate();
+  return timelog.filter(log => log.date === today);
+}
+
+
 route.post("/login", async (req, res) => {
     const { username, password } = req.body;
     const [login] = await Register.find({ username, password });
@@ -19,13 +33,13 @@ route.post("/login", async (req, res) => {
 })
 
 route.get("/allemp", async (req, res) => {
-    const login = await Register.find();
-    console.log(login)
-    if (login) {
-        return res.status(200).json({ data: login })
+    const empDetails = await Register.find();
+    console.log(empDetails)
+    if (empDetails) {
+        return res.status(200).json({ data: empDetails })
     }
     else {
-        return res.status(401).json({ message: 'User not fount' });
+        return res.status(401).json({ message: 'User not found' });
     }
 })
 
@@ -41,104 +55,99 @@ route.get("/allcheckin/:id", verifyToken, async (req, res) => {
     }
 })
 
-
-
-
 route.post("/checkin", verifyToken, async (req, res) => {
-    const { id, checkin } = req.body;
+  const { id, checkin } = req.body;
 
-    try {
-        const employee = await Register.findById(id);
+  try {
+    const employee = await Register.findById(id);
 
-        if (!employee) {
-            return res.status(404).json({ message: 'Employee not found' });
-        }
-
-        const now = new Date();
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const year = now.getFullYear();
-        const currentDate = `${day}/${month}/${year}`;
-
-        const alreadyCheckedIn = employee.timelog.find(log => log.date === currentDate);
-        if (alreadyCheckedIn) {
-            return res.status(400).json({ message: 'Employee Already checked in for this date' });
-        }
-        employee.status = true;
-        employee.timelog.push({
-            date: currentDate,
-            checkin: checkin,
-            checkout: '',
-            totalhours: ''
-        });
-
-        await employee.save();
-
-        res.status(200).json({ message: 'Check-in successful', timelog: employee.timelog });
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
     }
 
-})
+    const today = getCurrentDate();
 
-route.post('/checkout', verifyToken, async (req, res) => {
-    const { id, checkout } = req.body;
-
-    try {
-        const employee = await Register.findById(id);
-
-        if (!employee) {
-            return res.status(404).json({ message: 'Employee not found' });
-        }
-
-        const now = new Date();
-        const days = String(now.getDate()).padStart(2, '0');
-        const months = String(now.getMonth() + 1).padStart(2, '0');
-        const years = now.getFullYear();
-        const currentDate = `${days}/${months}/${years}`;
-
-        const log = employee.timelog.find(entry => entry.date === currentDate);
-        console.log(currentDate)
-
-        const [day, month, year] = currentDate.split('/');
-        const isoDate = `${year}-${month}-${day}`;
-        const checkinTime = new Date(`${isoDate}T${log.checkin}`);
-        const checkoutTime = new Date(`${isoDate}T${checkout}`);
-        const diffMs = checkoutTime - checkinTime;
-
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        console.log(hours, minutes)
-
-        const totalhours = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-        employee.status = false;
-        log.checkout = checkout;
-        log.totalhours = totalhours;
-
-        await employee.save();
-
-        res.status(200).json({ message: 'Checkout successful', timelog: employee.timelog });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+    // Check if already checked in today
+    const alreadyCheckedIn = employee.timelog.find(log => log.date === today);
+    if (alreadyCheckedIn) {
+      return res.status(400).json({ message: 'Already checked in today' });
     }
+
+    employee.status = true;
+    employee.timelog.push({
+      date: today,
+      checkin: checkin,
+      checkout: '',
+      totalhours: ''
+    });
+
+    await employee.save();
+
+    res.status(200).json({ message: 'Check-in successful', timelog: filterTodayLogs(employee.timelog) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
-route.get("/view/:id", async (req, res) => {
-    const { id } = req.params;
-    try {
-        const user = await Register.findById(id);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json(user);
-    } catch (err) {
-        console.error("Error fetching user:", err);
-        res.status(500).json({ error: "Server error" });
+
+route.post('/checkout', verifyToken, async (req, res) => {
+  const { id, checkout } = req.body;
+
+  try {
+    const employee = await Register.findById(id);
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
     }
-})
+
+    const today = getCurrentDate();
+    const log = employee.timelog.find(entry => entry.date === today);
+
+    if (!log || !log.checkin) {
+      return res.status(400).json({ message: 'Not checked in today' });
+    }
+
+    const [day, month, year] = today.split('/');
+    const isoDate = `${year}-${month}-${day}`;
+    const checkinTime = new Date(`${isoDate}T${log.checkin}`);
+    const checkoutTime = new Date(`${isoDate}T${checkout}`);
+
+    const diffMs = checkoutTime - checkinTime;
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+    log.checkout = checkout;
+    log.totalhours = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    employee.status = false;
+
+    await employee.save();
+
+    res.status(200).json({ message: 'Checkout successful', timelog: filterTodayLogs(employee.timelog) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+route.get("/view/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await Register.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const filtered = {
+      ...user.toObject(),
+      timelog: filterTodayLogs(user.timelog)
+    };
+    res.status(200).json(filtered);
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 route.put("/update/:id", async (req, res) => {
     const { id } = req.params;
