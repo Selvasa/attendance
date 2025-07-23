@@ -41,7 +41,6 @@ route.get("/allemp", async (req, res) => {
       }
     ]);
 
-    console.log(empDetails);
     return res.status(200).json({ data: empDetails });
   } catch (error) {
     console.error('Error fetching employee details:', error);
