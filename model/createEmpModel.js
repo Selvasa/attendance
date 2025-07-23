@@ -18,6 +18,14 @@ const createEmpSchema = new mongoose.Schema({
     address: String,
     phone: String,
     status: Boolean,
+    timelog: [{
+        date: String,
+        checkin: String,
+        checkout: String,
+        totalhours: String,
+        // workinghours:String,
+        autocheckout:{type:Boolean,default:false}
+    }]
 })
 
 const Register = mongoose.model("register", createEmpSchema);
