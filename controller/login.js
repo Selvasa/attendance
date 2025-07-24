@@ -8,7 +8,8 @@ const {
   getCurrentDate,
   filterTodayLogs,
   calculateDuration,
-  workingHours
+  workingHours,
+  getCurrentTime
 } = require('../utils/timeUtils');
 
 
@@ -70,8 +71,10 @@ route.post("/checkin", verifyToken, async (req, res) => {
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
-
     const today = getCurrentDate();
+    const checkin = getCurrentTime();
+
+    console.log(checkin)
 
     // Check if already checked in today
     const alreadyCheckedIn = employee.timelog.find(log => log.date === today);
@@ -100,14 +103,14 @@ route.post("/checkin", verifyToken, async (req, res) => {
 
 
 route.post('/checkout', verifyToken, async (req, res) => {
-  const { id, checkout } = req.body;
+  const { id } = req.body;
 
   try {
     const employee = await Register.findById(id);
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
-
+    const checkout = getCurrentTime();
     const today = getCurrentDate();
     const log = employee.timelog.find(entry => entry.date === today);
 
@@ -150,7 +153,7 @@ route.get("/view/:id", async (req, res) => {
     }
 
     hoursCalculation?.timelog?.map((item) => {
-      if (item.date === today && item.checkin) {
+      if (item.date === today && item.checkin && item.checkout === "") {
         const workinghour = workingHours(item.checkin);
         item.totalhours = workinghour
       }

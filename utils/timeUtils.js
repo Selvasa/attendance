@@ -6,13 +6,19 @@ function getCurrentDate() {
   return `${day}/${month}/${year}`;
 }
 
+function getCurrentTime() {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
 function filterTodayLogs(timelog = []) {
   const today = getCurrentDate();
   return timelog.filter(log => log.date === today);
 }
 
 function padTime(timeStr) {
-  console.log("timeStr",timeStr)
   const [hour, minute] = timeStr.split(':');
   return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
 }
@@ -85,5 +91,6 @@ module.exports = {
   filterTodayLogs,
   calculateDuration,
   updateTimeLog,
-  workingHours
+  workingHours,
+  getCurrentTime
 };
