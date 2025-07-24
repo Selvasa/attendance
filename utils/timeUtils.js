@@ -11,13 +11,31 @@ function filterTodayLogs(timelog = []) {
   return timelog.filter(log => log.date === today);
 }
 
+function padTime(timeStr) {
+  const [hour, minute] = timeStr.split(':');
+  return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
+}
+
 function calculateDuration(checkin, checkout) {
-  const start = new Date(checkin);
-  const end = new Date(checkout);
-  const diffMs = end - start;
+
+  const [day, month, year] = getCurrentDate().split('/');
+  const isoDate = `${year}-${month}-${day}`;
+
+  const normalizedCheckin = padTime(checkin);
+  const normalizedCheckout = padTime(checkout);
+
+  const checkinTime = new Date(`${isoDate}T${normalizedCheckin}`);
+  const checkoutTime = new Date(`${isoDate}T${normalizedCheckout}`);
+
+  const diffMs = checkoutTime - checkinTime;
+
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  console.log(hours, minutes)
+
+  const totalhours = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  console.log(totalhours)
+  return totalhours;
 }
 
 // Automatically checkout users after 12 hours if not checked out

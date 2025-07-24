@@ -121,7 +121,8 @@ route.post('/checkout', verifyToken, async (req, res) => {
     }
 
     log.checkout = checkout;
-    log.totalhours = calculateDuration(log.checkin, log.checkout);
+    console.log(log.checkin,checkout)
+    log.totalhours = calculateDuration(log.checkin, checkout);
     log.autocheckout = false;
     employee.status = false;
 
