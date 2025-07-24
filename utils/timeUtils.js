@@ -12,10 +12,35 @@ function filterTodayLogs(timelog = []) {
 }
 
 function padTime(timeStr) {
+  console.log("timeStr",timeStr)
   const [hour, minute] = timeStr.split(':');
   return `${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
 }
 
+// Calculate Working hours when the user login
+
+function workingHours(checkin) {
+  const [day, month, year] = getCurrentDate().split('/');
+  const isoDate = `${year}-${month}-${day}`;
+
+  const normalizedCheckin = padTime(checkin);
+  const checkinTime = new Date(`${isoDate}T${normalizedCheckin}`);
+
+  const now = new Date(); // Current time
+  const diffMs = now - checkinTime;
+
+  if (diffMs < 0) {
+    return "00:00"; // Check-in is in the future — handle as needed
+  }
+
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  const totalhours = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  return totalhours;
+}
+
+// Calculate total hours after the user check out
 function calculateDuration(checkin, checkout) {
 
   const [day, month, year] = getCurrentDate().split('/');
@@ -59,5 +84,6 @@ module.exports = {
   getCurrentDate,
   filterTodayLogs,
   calculateDuration,
-  updateTimeLog
+  updateTimeLog,
+  workingHours
 };

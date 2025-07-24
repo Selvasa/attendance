@@ -8,6 +8,7 @@ const {
   getCurrentDate,
   filterTodayLogs,
   calculateDuration,
+  workingHours
 } = require('../utils/timeUtils');
 
 
@@ -60,7 +61,7 @@ route.get("/allcheckin/:id", verifyToken, async (req, res) => {
   }
 })
 
-route.post("/checkin", verifyToken, async (req, res) => {
+route.post("/checkin", /*verifyToken,*/ async (req, res) => {
   const { id, checkin } = req.body;
 
   try {
@@ -78,11 +79,13 @@ route.post("/checkin", verifyToken, async (req, res) => {
       return res.status(400).json({ message: 'Already checked in today' });
     }
 
+
     employee.status = true;
     employee.timelog.push({
       date: today,
       checkin: checkin,
       checkout: '',
+      workinghours: "",
       totalhours: ''
     });
 
@@ -96,7 +99,7 @@ route.post("/checkin", verifyToken, async (req, res) => {
 });
 
 
-route.post('/checkout', verifyToken, async (req, res) => {
+route.post('/checkout', /*verifyToken,*/ async (req, res) => {
   const { id, checkout } = req.body;
 
   try {
@@ -121,7 +124,7 @@ route.post('/checkout', verifyToken, async (req, res) => {
     }
 
     log.checkout = checkout;
-    console.log(log.checkin,checkout)
+    console.log(log.checkin, checkout)
     log.totalhours = calculateDuration(log.checkin, checkout);
     log.autocheckout = false;
     employee.status = false;
@@ -138,6 +141,22 @@ route.post('/checkout', verifyToken, async (req, res) => {
 route.get("/view/:id", async (req, res) => {
   const { id } = req.params;
   try {
+    const today = getCurrentDate();
+    const hoursCalculation = await Register.findById(id);
+
+    if (!hoursCalculation) {
+      console.error("User not found");
+      return;
+    }
+
+    hoursCalculation?.timelog?.map((item) => {
+      if (item.date === today && item.checkin) {
+        const workinghour = workingHours(item.checkin);
+        item.totalhours = workinghour
+      }
+    })
+    await hoursCalculation.save();
+
     const user = await Register.findById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });

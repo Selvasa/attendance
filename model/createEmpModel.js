@@ -23,6 +23,7 @@ const createEmpSchema = new mongoose.Schema({
         checkin: String,
         checkout: String,
         totalhours: String,
+        // workinghours:String,
         autocheckout:{type:Boolean,default:false}
     }]
 })
