@@ -61,7 +61,7 @@ route.get("/allcheckin/:id", verifyToken, async (req, res) => {
   }
 })
 
-route.post("/checkin", /*verifyToken,*/ async (req, res) => {
+route.post("/checkin", verifyToken, async (req, res) => {
   const { id, checkin } = req.body;
 
   try {
@@ -99,7 +99,7 @@ route.post("/checkin", /*verifyToken,*/ async (req, res) => {
 });
 
 
-route.post('/checkout', /*verifyToken,*/ async (req, res) => {
+route.post('/checkout', verifyToken, async (req, res) => {
   const { id, checkout } = req.body;
 
   try {
