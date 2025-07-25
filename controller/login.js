@@ -7,7 +7,6 @@ const { Query } = require('mongoose');
 const {
   getCurrentDate,
   filterTodayLogs,
-  calculateDuration,
   workingHours,
   getCurrentTime
 } = require('../utils/timeUtils');
@@ -63,7 +62,7 @@ route.get("/allcheckin/:id", verifyToken, async (req, res) => {
 })
 
 route.post("/checkin", verifyToken, async (req, res) => {
-  const { id, checkin } = req.body;
+  const { id } = req.body;
 
   try {
     const employee = await Register.findById(id);
@@ -72,9 +71,7 @@ route.post("/checkin", verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'Employee not found' });
     }
     const today = getCurrentDate();
-    const checkin = getCurrentTime();
-
-    console.log(checkin)
+    const checkin = getCurrentTime().toISOString();
 
     // Check if already checked in today
     const alreadyCheckedIn = employee.timelog.find(log => log.date === today);
@@ -110,8 +107,8 @@ route.post('/checkout', verifyToken, async (req, res) => {
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
     }
-    const checkout = getCurrentTime();
     const today = getCurrentDate();
+    const checkout = getCurrentTime().toISOString();
     const log = employee.timelog.find(entry => entry.date === today);
 
     if (!log || !log.checkin) {
@@ -119,16 +116,15 @@ route.post('/checkout', verifyToken, async (req, res) => {
     }
 
     const checkinTime = new Date(log.checkin);
-    const checkoutTime = new Date(checkout);
+    const checkoutTime = new Date();
     const diffMins = (checkoutTime - checkinTime) / (1000 * 60);
-
+    console.log("diffMins", diffMins)
     if (diffMins < 30) {
       return res.status(403).json({ message: 'Cannot checkout before 30 minutes of check-in' });
     }
 
     log.checkout = checkout;
-    console.log(log.checkin, checkout)
-    log.totalhours = calculateDuration(log.checkin, checkout);
+    log.totalhours = workingHours(log.checkin);
     log.autocheckout = false;
     employee.status = false;
 
@@ -152,8 +148,8 @@ route.get("/view/:id", async (req, res) => {
       return;
     }
 
-    hoursCalculation?.timelog?.map((item) => {
-      if (item.date === today && item.checkin && item.checkout === "") {
+    hoursCalculation?.status && hoursCalculation?.timelog?.map((item) => {
+      if (item.date === today && item.checkin) {
         const workinghour = workingHours(item.checkin);
         item.totalhours = workinghour
       }
