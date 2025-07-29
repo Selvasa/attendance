@@ -35,26 +35,26 @@ function filterTodayLogs(timelog = []) {
 }
 
 // Automatically checkout users after 12 hours if not checked out
-function updateTimeLog(log) {
-  if (log.checkout) return log; // Already checked out
+// function updateTimeLog(log) {
+//   if (log.checkout) return log; // Already checked out
 
-  const checkinTime = new Date(log.checkin);
-  const now = new Date();
-  const twelveHoursLater = new Date(checkinTime.getTime() + 12 * 60 * 60 * 1000);
+//   const checkinTime = new Date(log.checkin);
+//   const now = new Date();
+//   const twelveHoursLater = new Date(checkinTime.getTime() + 12 * 60 * 60 * 1000);
 
-  if (now >= twelveHoursLater) {
-    log.checkout = twelveHoursLater.toISOString();
-    log.totalhours = calculateDuration(log.checkin, log.checkout);
-    log.autocheckout = true;
-  }
+//   if (now >= twelveHoursLater) {
+//     log.checkout = twelveHoursLater.toISOString();
+//     log.totalhours = calculateDuration(log.checkin, log.checkout);
+//     log.autocheckout = true;
+//   }
 
-  return log;
-}
+//   return log;
+// }
 
 module.exports = {
   getCurrentDate,
   filterTodayLogs,
-  updateTimeLog,
+  // updateTimeLog,
   workingHours,
   getCurrentTime
 };

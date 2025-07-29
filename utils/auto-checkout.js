@@ -1,8 +1,9 @@
 const Register = require('../model/createEmpModel'); // adjust path if needed
-const mongoose = require('mongoose');
+const { workingHours } = require('./timeUtils');
 
 // 12 hours in milliseconds
-const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+const TWELVE_HOURS = 9 * 60 * 60 * 1000;
+// const TWELVE_HOURS = 10 * 60 * 1000;
 
 const autoCheckout = async () => {
   try {
@@ -22,12 +23,13 @@ const autoCheckout = async () => {
 
         if (now - checkinTime >= TWELVE_HOURS) {
           // Auto checkout
-          todayLog.checkout = now.toISOString();
-
+          
           // Calculate total hours
-          const diffMs = now - checkinTime;
-          const totalHours = (diffMs / (1000 * 60 * 60)).toFixed(2); // in hours
-          todayLog.totalhours = totalHours;
+          //const diffMs = now - checkinTime;
+          //const totalHours = (diffMs / (1000 * 60 * 60)).toFixed(2); // in hours
+          user.status = false;
+          todayLog.checkout = now.toISOString();
+          todayLog.totalhours = workingHours(checkinTime);
 
           // Save user
           user.markModified('timelog');
