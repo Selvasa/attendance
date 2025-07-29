@@ -2,10 +2,10 @@ const Register = require('../model/createEmpModel'); // adjust path if needed
 const { workingHours } = require('./timeUtils');
 
 // 12 hours in milliseconds
-const TWELVE_HOURS = 9 * 60 * 60 * 1000;
 // const TWELVE_HOURS = 10 * 60 * 1000;
 
 const autoCheckout = async () => {
+  const TWELVE_HOURS = 10 * 60 * 60 * 1000;
   try {
     const allUsers = await Register.find();
 
