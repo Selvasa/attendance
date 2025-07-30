@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "./index.js", "use": "@vercel/node" }
-  ],
-  "routes": [{ "src": "/(.*)", "dest": "/index.js" }],
-  "crons":[{
-    "path":"/auto-checkout",
-    "schedule": "30 12 * * *"
-  }]
+  "builds": [{ "src": "./index.js", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "/index.js" }]
 }
