@@ -79,7 +79,6 @@ route.post("/checkin", verifyToken, async (req, res) => {
       return res.status(400).json({ message: 'Already checked in today' });
     }
 
-
     employee.status = true;
     employee.timelog.push({
       date: today,
