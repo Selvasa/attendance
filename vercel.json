@@ -6,7 +6,7 @@
   ],
   "routes": [{ "src": "/(.*)", "dest": "/index.js" }],
   "crons":[{
-    "path":"/api/checkout",
-    "schedule": "30 11 * * *"
+    "path":"/api/auto-checkout",
+    "schedule": "0 12 * * *"
   }]
 }
