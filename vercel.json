@@ -10,7 +10,7 @@
   "crons": [
     {
       "path": "/api/auto-checkout",
-      "schedule": "40 12 * * *"
+      "schedule": "23 18 * * *"
     }
   ]
 }
