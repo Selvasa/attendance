@@ -8,7 +8,7 @@
   "crons": [
     {
       "path": "/every-minute",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 19 * * *"
     }
   ]
 }
