@@ -7,8 +7,9 @@
   ],
   "crons": [
     {
-      "path": "/every-minute",
-      "schedule": "0 19 * * *"
+      "path": "/api/auto-checkout.js",
+      "schedule": "10 11 * * *",
+      "timezone": "Asia/Kolkata"
     }
   ]
 }
