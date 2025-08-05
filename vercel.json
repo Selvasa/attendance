@@ -5,10 +5,10 @@
     { "src": "./index.js", "use": "@vercel/node" }
   ],
   "routes": [{ "src": "/(.*)", "dest": "/index.js" }],
-  "crons": [
+  "cron": [
     {
       "path": "/api/auto-checkout.js",
-      "schedule": "40 5 * * *"
+      "schedule": "50 5 * * *"
     }
   ]
 }

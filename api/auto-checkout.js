@@ -1,11 +1,7 @@
-const Register = require("../model/createEmpModel");
-const { getCurrentDate, getCurrentTime, workingHours } = require("../utils/timeUtils");
+import Register from '../model/createEmpModel.js';
+import { getCurrentDate, getCurrentTime, workingHours } from '../utils/timeUtils.js';
 
-async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
-
+export async function GET(request) {
   try {
     const allUsers = await Register.find();
 
@@ -28,12 +24,16 @@ async function handler(req, res) {
       }
     }
 
-    res.status(200).json({ message: 'Auto checkout completed' });
+    return new Response(JSON.stringify({ message: 'Auto checkout completed' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Auto-checkout error:", err);
+    return new Response(JSON.stringify({ message: 'Server error', error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
-
-module.exports = handler;
