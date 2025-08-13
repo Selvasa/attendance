@@ -3,7 +3,6 @@ const route = express.Router();
 const Register = require("../model/createEmpModel");
 const generateToken = require("../middleware/token");
 const verifyToken = require('../middleware/verify');
-const { Query } = require('mongoose');
 const {
   getCurrentDate,
   filterTodayLogs,
@@ -170,6 +169,26 @@ route.get("/view/:id", async (req, res) => {
   }
 });
 
+route.post("/filterby", async (req, res) => {
+  const { id, month, year } = req.body;
+  try {
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+    console.log(monthNum, yearNum)
+    const user = await Register.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const filtered = user.timelog.filter(log => {
+      const [day, m, y] = log.date.split("/").map(Number); // date format "dd/mm/yyyy"
+      return m === monthNum && y === yearNum;
+    });
+    res.status(200).json({data:filtered});
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+})
 
 route.put("/update/:id", async (req, res) => {
   const { id } = req.params;
