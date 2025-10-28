@@ -25,7 +25,19 @@ const createEmpSchema = new mongoose.Schema({
         totalhours: String,
         // workinghours:String,
         autocheckout:{type:Boolean,default:false}
-    }]
+    }],
+    wwtId: String,
+    basicPay: Number,
+    hra: Number,
+    others: Number,
+    incentive: Number,
+    staffAdvance: Number,
+    tds: Number,
+    esi: Number,
+    pf: Number, 
+    alternativeBankAccount: Number,
+    alternativePhoneNumber: Number, 
+    additionalFiled: String
 })
 
 const Register = mongoose.model("register", createEmpSchema);
