@@ -27,7 +27,9 @@ const payslipSchema = new mongoose.Schema({
     totalDeductions: Number,
     netPay: Number,
     amountWords: String,
-    paymentMode: String
+    paymentMode: String,
+    additionalFiled: String,
+    wwtId: String,
 });
 
 const Payslip = mongoose.model('payslip', payslipSchema);

@@ -9,7 +9,7 @@ const login = require("./controller/login");
 const paySlip = require("./controller/paySlip");
 
 const cron = require('node-cron');
-const autoCheckout = require('./api/auto-checkout');
+// const autoCheckout = require('./api/auto-checkout');
 
 async function connectDB() {
     await mongoose.connect(process.env.CONNECTION_STRING, { dbName: process.env.DB_NAME }, {
@@ -31,10 +31,10 @@ app.use(login);
 app.use(paySlip);
 
 // Run every 5 minutes
-cron.schedule('*/5 * * * *', () => {
-  console.log('Running auto-checkout task...');
-  autoCheckout();
-});
+// cron.schedule('*/5 * * * *', () => {
+//   console.log('Running auto-checkout task...');
+//   autoCheckout();
+// });
 
 app.listen(1001, () => {
     console.log("Server connected port 1001")
