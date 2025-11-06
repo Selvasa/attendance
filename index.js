@@ -7,6 +7,7 @@ const cors = require('cors');
 const register = require("./controller/register");
 const login = require("./controller/login");
 const paySlip = require("./controller/paySlip");
+const takeBreak=require("./controller/takeBreak")
 
 const cron = require('node-cron');
 // const autoCheckout = require('./api/auto-checkout');
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 app.use(register);
 app.use(login);
 app.use(paySlip);
+app.use(takeBreak);
 
 // Run every 5 minutes
 // cron.schedule('*/5 * * * *', () => {
